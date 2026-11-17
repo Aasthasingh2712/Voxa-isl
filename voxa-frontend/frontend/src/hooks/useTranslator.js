@@ -4,6 +4,8 @@ import { INITIAL_HISTORY } from "../utils/mockData";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const CONSECUTIVE_REQUIRED = 3;
+// Frames below this confidence never count toward a letter (raise it for fewer false letters).
+const AZ_MIN_CONFIDENCE = 0.6;
 
 export function useTranslator() {
   const [currentTranslation, setCurrentTranslation] = useState(null);
@@ -17,6 +19,7 @@ export function useTranslator() {
   const requestSequenceRef = useRef(0);
   const predictionBufferRef = useRef([]);
   const lastCommittedSignRef = useRef(null);
+  const sentenceRef = useRef(""); // letters committed so far (the text being spelled)
 
   const checkHealth = useCallback(async () => {
     try {
@@ -49,6 +52,7 @@ export function useTranslator() {
     setCurrentTranslation(null);
     predictionBufferRef.current = [];
     lastCommittedSignRef.current = null;
+    sentenceRef.current = "";
   }, []);
 
   const clearHistory = useCallback(() => {
@@ -186,6 +190,147 @@ export function useTranslator() {
     }
   }, []);
 
+  // A-Z fingerspelling: sends BOTH hands (each tagged Left/Right) to /predict-az and
+  // builds a sentence out of the letters that stay stable for a few predictions in a row.
+  const translateHands = useCallback(async (hands) => {
+    if (requestInFlightRef.current || !hands) return;
+
+    const isValidHand = (h) =>
+      h &&
+      Array.isArray(h.landmarks) &&
+      h.landmarks.length === 21 &&
+      h.landmarks.every(
+        (lm) =>
+          lm &&
+          Number.isFinite(lm.x) &&
+          Number.isFinite(lm.y) &&
+          Number.isFinite(lm.z)
+      );
+    const toPayload = (handedness, h) => ({
+      handedness,
+      landmarks: h.landmarks.map((lm) => ({
+        x: Number(lm.x),
+        y: Number(lm.y),
+        z: Number(lm.z),
+      })),
+    });
+
+    const payloadHands = [];
+    if (isValidHand(hands.left)) payloadHands.push(toPayload("Left", hands.left));
+    if (isValidHand(hands.right)) payloadHands.push(toPayload("Right", hands.right));
+    if (payloadHands.length === 0) return;
+
+    requestInFlightRef.current = true;
+    setIsTranslating(true);
+
+    const seq = ++requestSequenceRef.current;
+    const controller = new AbortController();
+    activeAbortControllerRef.current = controller;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/predict-az`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hands: payloadHands }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      if (seq !== requestSequenceRef.current || controller.signal.aborted) {
+        return;
+      }
+
+      setModelReady(true);
+      setApiError(null);
+
+      const letter = String(data.prediction);
+      const confidence = Number(data.confidence);
+      const sure = confidence >= AZ_MIN_CONFIDENCE;
+
+      // An unsure frame breaks the "same letter N times in a row" run.
+      predictionBufferRef.current.push(sure ? letter : null);
+      const buf = predictionBufferRef.current;
+      if (buf.length > 20) buf.shift();
+      if (!sure) return;
+
+      let consecutiveCount = 0;
+      for (let i = buf.length - 1; i >= 0; i--) {
+        if (buf[i] === letter) {
+          consecutiveCount++;
+        } else {
+          break;
+        }
+      }
+
+      if (
+        consecutiveCount >= CONSECUTIVE_REQUIRED &&
+        lastCommittedSignRef.current !== letter
+      ) {
+        lastCommittedSignRef.current = letter;
+        sentenceRef.current += letter;
+
+        const confPercent = Math.round(confidence * 100);
+        const id = Date.now().toString();
+        const timestamp = new Date();
+
+        setCurrentTranslation({
+          id,
+          sign: letter,
+          translation: sentenceRef.current,
+          confidence: confPercent,
+          timestamp,
+        });
+        setHistory((prev) =>
+          [
+            { id, sign: letter, translation: letter, confidence: confPercent, timestamp },
+            ...prev,
+          ].slice(0, 20)
+        );
+      }
+    } catch (err) {
+      if (err.name === "AbortError") {
+        return;
+      }
+      setModelReady(false);
+      setApiError(err.message || "Prediction request failed");
+    } finally {
+      requestInFlightRef.current = false;
+      setIsTranslating(false);
+      if (activeAbortControllerRef.current === controller) {
+        activeAbortControllerRef.current = null;
+      }
+    }
+  }, []);
+
+  const addSpace = useCallback(() => {
+    if (!sentenceRef.current || sentenceRef.current.endsWith(" ")) return;
+    sentenceRef.current += " ";
+    const text = sentenceRef.current;
+    setCurrentTranslation((prev) => (prev ? { ...prev, translation: text } : prev));
+  }, []);
+
+  const backspace = useCallback(() => {
+    if (!sentenceRef.current) return;
+    sentenceRef.current = sentenceRef.current.slice(0, -1);
+    const text = sentenceRef.current;
+    setCurrentTranslation((prev) =>
+      text
+        ? {
+            id: Date.now().toString(),
+            sign: text.trim().slice(-1),
+            translation: text,
+            confidence: prev ? prev.confidence : 100,
+            timestamp: new Date(),
+          }
+        : null
+    );
+  }, []);
+
   const speakText = useCallback((text) => {
     if (!text || !("speechSynthesis" in window)) return;
 
@@ -205,6 +350,9 @@ export function useTranslator() {
     modelReady,
     apiError,
     translateLandmarks,
+    translateHands,
+    addSpace,
+    backspace,
     resetStabilization,
     clearTranslation,
     clearHistory,

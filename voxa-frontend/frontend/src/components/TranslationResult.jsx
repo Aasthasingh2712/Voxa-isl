@@ -5,6 +5,8 @@ export default function TranslationResult({
   isTranslating,
   onSpeak,
   onClear,
+  onSpace,
+  onBackspace,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -124,6 +126,22 @@ export default function TranslationResult({
         >
           {copied ? <CheckIcon /> : <CopyIcon />}
           {copied ? "Copied!" : "Copy"}
+        </button>
+
+        <button
+          className="btn btn-outline"
+          onClick={onSpace}
+          disabled={!result}
+        >
+          Space
+        </button>
+
+        <button
+          className="btn btn-outline"
+          onClick={onBackspace}
+          disabled={!result}
+        >
+          Backspace
         </button>
       </div>
     </div>

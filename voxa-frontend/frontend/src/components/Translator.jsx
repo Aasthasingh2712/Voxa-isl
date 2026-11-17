@@ -10,6 +10,7 @@ export default function Translator({ translator }) {
   const landmarker = useHandLandmarker();
   const animFrameIdRef = useRef(null);
   const latestLandmarksRef = useRef(null);
+  const latestHandsRef = useRef(null);
   const wasHandDetectedRef = useRef(false);
   const noHandFrameCountRef = useRef(0);
 
@@ -43,6 +44,7 @@ export default function Translator({ translator }) {
 
         if (res && res.primaryLandmarks && res.primaryLandmarks.length === 21) {
           latestLandmarksRef.current = res.primaryLandmarks;
+          latestHandsRef.current = { left: res.leftHand, right: res.rightHand };
           wasHandDetectedRef.current = true;
           noHandFrameCountRef.current = 0;
         } else {
@@ -53,9 +55,6 @@ export default function Translator({ translator }) {
             latestLandmarksRef.current = null;
             if (wasHandDetectedRef.current) {
               translatorRef.current.resetStabilization();
-              if (translatorRef.current.currentTranslation !== null) {
-                translatorRef.current.clearTranslation();
-              }
               wasHandDetectedRef.current = false;
             }
           }
@@ -73,9 +72,6 @@ export default function Translator({ translator }) {
         latestLandmarksRef.current = null;
         if (wasHandDetectedRef.current) {
           translatorRef.current.resetStabilization();
-          if (translatorRef.current.currentTranslation !== null) {
-            translatorRef.current.clearTranslation();
-          }
           wasHandDetectedRef.current = false;
         }
       }
@@ -132,7 +128,7 @@ export default function Translator({ translator }) {
         latestLandmarksRef.current &&
         latestLandmarksRef.current.length === 21
       ) {
-        translatorRef.current.translateLandmarks(latestLandmarksRef.current);
+        translatorRef.current.translateHands(latestHandsRef.current);
       }
     }, 400);
 
@@ -169,7 +165,7 @@ export default function Translator({ translator }) {
   const handleCapture = () => {
     camera.captureFrame();
     if (latestLandmarksRef.current) {
-      translatorRef.current.translateLandmarks(latestLandmarksRef.current);
+      translatorRef.current.translateHands(latestHandsRef.current);
     }
   };
 
@@ -193,7 +189,7 @@ export default function Translator({ translator }) {
               textAlign: "center",
             }}
           >
-            Start your camera and perform an ISL gesture for live translation.
+            Start your camera and spell words in ISL fingerspelling (A-Z), one letter at a time. Hold each letter steady for about a second.
           </p>
         </div>
 
@@ -221,6 +217,8 @@ export default function Translator({ translator }) {
             isTranslating={translator.isTranslating}
             onSpeak={translator.speakText}
             onClear={translator.clearTranslation}
+            onSpace={translator.addSpace}
+            onBackspace={translator.backspace}
           />
         </div>
       </div>
