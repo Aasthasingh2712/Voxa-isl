@@ -1,0 +1,22 @@
+# Python
+Backend/venv/
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Generated ML experiment outputs
+ml/outputs/
+
+# Temporary API/integration test scripts
+test_api.py
+test_phase3_integration.py
