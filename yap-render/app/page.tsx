@@ -132,6 +132,13 @@ export default function Page() {
     hidden: { opacity: 0, y: reducedMotion ? 0 : -24, filter: reducedMotion ? 'blur(0px)' : 'blur(3px)' },
   }
   const [menuOpen, setMenuOpen] = useState(false)
+  // Embedded in Voxa as the "Word Signs" page: open the camera Sign to Text stage straight away.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('embed') !== 'sign') return
+    const timer = window.setTimeout(() => sign.open({ x: window.innerWidth / 2, y: window.innerHeight / 2 }), 400)
+    return () => window.clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [translation, setTranslation] = useState('YOU HOME')
   const [avatarModel, setAvatarModel] = useState<'default' | 'human'>('default')
   const [avatarRequests, setAvatarRequests] = useState<AvatarRequest[]>([])

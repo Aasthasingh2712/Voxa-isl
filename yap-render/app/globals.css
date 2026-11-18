@@ -528,3 +528,59 @@ html { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
   .marquee-track { animation: none; }
 }
 *:focus-visible { outline: 2px solid var(--coral); outline-offset: 4px; }
+
+/* ---- Embed mode: Yap & Render shown inside the Voxa website (no site chrome) ---- */
+html[data-embed] .site-skip-link,
+html[data-embed] .topbar,
+html[data-embed] .marquee-band,
+html[data-embed] .feature-section,
+html[data-embed] .proof-band,
+html[data-embed] .final-cta,
+html[data-embed] .footer,
+html[data-embed] .hero-copy,
+html[data-embed] .camera-mode-tile,
+html[data-embed] .mode-dock,
+html[data-embed] .sign-story,
+html[data-embed] .terminal-chrome { display: none !important; }
+html[data-embed],
+html[data-embed] body,
+html[data-embed] .site-shell { background: transparent; }
+html[data-embed] .hero { display: block; min-height: 0; padding: .25rem 0 1rem; }
+html[data-embed] .hero .avatar-stage { width: 100%; max-width: 100%; }
+html[data-embed="sign"] .hero { display: none !important; }
+html[data-embed="sign"] .sign-stage-close { display: none !important; }
+
+/* ---- Embed mode: re-skin Yap & Render with the Voxa design tokens ---- */
+html[data-embed] {
+  --background: #f7f6f2;
+  --foreground: #20242b;
+  --primary: #4f6d8a;
+  --primary-foreground: #ffffff;
+  --border: #dcdcd6;
+  --ring: #4f6d8a;
+  --coral: #4f6d8a;
+  --lime: #8fc9c2;
+  --ink-soft: #5a6068;
+  --ink-faint: #8b9096;
+  --surface: #f1f0eb;
+  --radius: 14px;
+  --font-dm-sans: "Inter", sans-serif;
+  --font-dm-serif: "Outfit", sans-serif;
+}
+html[data-embed] h1,
+html[data-embed] h2,
+html[data-embed] h3 { font-weight: 600; letter-spacing: -.02em; }
+html[data-embed] h1 em,
+html[data-embed] h2 em { font-style: normal; }
+html[data-embed] .terminal-stop { background: #b95d5d; }
+html[data-embed] .terminal-stop:hover { background: #20242b; }
+html[data-embed] .terminal-window { border-radius: 20px; border-color: #dcdcd6; box-shadow: none; }
+html[data-embed] .avatar-canvas-shell { background: #f1f0eb; }
+
+/* Word Signs (camera Sign -> Text): Voxa's page already has the heading, so keep this one for screen readers only */
+html[data-embed="sign"] .sign-stage-header h2 {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+html[data-embed="sign"] .sign-stage { padding: 12px 16px 16px; }
+html[data-embed="sign"] .sign-viewfinder { border-radius: 20px 20px 0 0; border-color: #dcdcd6; }

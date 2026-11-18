@@ -91,13 +91,13 @@ export function useHandLandmarker() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
-    setHandDetected(false);
-    setHandCount(0);
-    setLandmarks([]);
-    setHandedness(null);
-    setHands([]);
-    setLeftHand(null);
-    setRightHand(null);
+        setHandDetected((prev) => (prev ? false : prev));
+    setHandCount((prev) => (prev ? 0 : prev));
+    setLandmarks((prev) => (prev.length ? [] : prev));
+    setHandedness((prev) => (prev === null ? prev : null));
+    setHands((prev) => (prev.length ? [] : prev));
+    setLeftHand((prev) => (prev === null ? prev : null));
+    setRightHand((prev) => (prev === null ? prev : null));
   }, []);
 
   const drawLandmarks = useCallback((ctx, landmarksList, width, height, handCategory = null) => {

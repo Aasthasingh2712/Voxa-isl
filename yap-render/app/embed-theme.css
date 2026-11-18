@@ -1,0 +1,213 @@
+/* ===== Embed theme: makes the avatar / camera pages look like the Voxa website =====
+   Only active when the page is opened with ?embed=text or ?embed=sign (see layout.tsx). */
+
+html[data-embed] {
+  /* Voxa palette */
+  --background: #f7f6f2;
+  --foreground: #20242b;
+  --primary: #4f6d8a;
+  --primary-foreground: #ffffff;
+  --border: #dcdcd6;
+  --ring: #4f6d8a;
+  --coral: #4f6d8a;
+  --lime: #5f8f8a;
+  --ink-soft: #5a6068;
+  --ink-faint: #8b9096;
+  --surface: #f1f0eb;
+  /* Voxa fonts: Outfit (display), Inter (body), JetBrains Mono (labels) */
+  --font-dm-sans: var(--font-inter), Inter, system-ui, sans-serif;
+  --font-dm-serif: var(--font-outfit), Outfit, system-ui, sans-serif;
+  --vx-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+  --vx-muted: rgba(79, 109, 138, 0.1);
+  --vx-danger: #b95d5d;
+}
+
+html[data-embed] body { font-family: var(--font-dm-sans); color: var(--foreground); }
+
+/* ---- Avatar workspace ---- */
+html[data-embed] .terminal-window {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(32, 36, 43, 0.08);
+}
+html[data-embed] .terminal-body { background: transparent; }
+html[data-embed] .avatar-canvas-shell {
+  background: #f1f0eb;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+html[data-embed] .canvas-badge { color: var(--ink-soft); font-family: var(--vx-mono); }
+html[data-embed] .live-dot { background: #5f8f8a; box-shadow: 0 0 0 4px rgba(95, 143, 138, 0.2); }
+
+html[data-embed] .engine-selector,
+html[data-embed] .avatar-selector {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(32, 36, 43, 0.08);
+  font-family: var(--vx-mono);
+}
+html[data-embed] .engine-selector button,
+html[data-embed] .avatar-selector button { border-radius: 7px; color: var(--ink-soft); }
+html[data-embed] .engine-selector button.is-selected,
+html[data-embed] .avatar-selector button.is-selected,
+html[data-embed] .avatar-selector button:hover { background: var(--primary); color: #fff; }
+
+html[data-embed] .terminal-footer {
+  border-top-color: var(--border);
+  color: var(--ink-faint);
+  font-family: var(--vx-mono);
+}
+
+/* ---- Inputs ---- */
+html[data-embed] .translator-controls input,
+html[data-embed] .avatar-command-input input {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--foreground);
+  font-family: var(--font-dm-sans);
+  font-size: 0.9rem;
+}
+html[data-embed] .translator-controls input:focus,
+html[data-embed] .avatar-command-input input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 109, 138, 0.16);
+}
+
+/* ---- Buttons ---- */
+html[data-embed] .voice-input,
+html[data-embed] .quick-phrases-track button,
+html[data-embed] .avatar-command-list button {
+  background: var(--vx-muted);
+  color: var(--primary);
+  border-radius: 10px;
+  font-family: var(--font-dm-sans);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+html[data-embed] .voice-input:hover:not(:disabled),
+html[data-embed] .quick-phrases-track button:hover,
+html[data-embed] .avatar-command-list button:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+html[data-embed] .voice-input.is-listening { background: var(--vx-danger); color: #fff; }
+
+html[data-embed] .live-translation {
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--ink-soft);
+  border-radius: 10px;
+  font-family: var(--font-dm-sans);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+html[data-embed] .live-translation.is-active { border-color: #5f8f8a; color: #4a7a75; }
+html[data-embed] .live-translation.is-active span { background: #5f8f8a; }
+
+html[data-embed] .terminal-play { background: var(--primary); color: #fff; border-radius: 8px; }
+html[data-embed] .terminal-stop { background: var(--vx-danger); color: #fff; }
+html[data-embed] .terminal-stop:hover { background: var(--foreground); }
+
+html[data-embed] .quick-phrases-arrow {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--ink-soft);
+  border-radius: 10px;
+}
+html[data-embed] .quick-phrases-arrow:hover { background: var(--primary); color: #fff; }
+
+html[data-embed] .avatar-command-panel {
+  border: 1px solid var(--border);
+  background: #ffffff;
+  border-radius: 14px;
+}
+html[data-embed] .avatar-command-input,
+html[data-embed] .avatar-command-actions { border-color: var(--border); }
+
+/* ---- Camera Sign -> Text (Word Signs page) ---- */
+html[data-embed] .sign-viewfinder {
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  background: #20242b;
+}
+html[data-embed] .sign-camera-controls button {
+  background: rgba(32, 36, 43, 0.82);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+html[data-embed] .sign-camera-controls button[aria-pressed="true"] {
+  background: rgba(79, 109, 138, 0.95);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+html[data-embed] .sign-model-chip {
+  background: rgba(32, 36, 43, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #cfe3e0;
+  font-family: var(--vx-mono);
+}
+html[data-embed] .sign-model-chip button { color: #9fd0c9; }
+html[data-embed] .sign-camera-caption { background: rgba(32, 36, 43, 0.85); }
+html[data-embed] .has-hand-lock .sign-brackets { color: #9fd0c9; border-color: #9fd0c9; }
+html[data-embed] .sign-transcript {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: var(--border);
+  border-radius: 0 0 18px 18px;
+}
+
+/* ======================================================================
+   Word Signs page (camera Sign -> Text, ?embed=sign): Voxa look.
+   Scoped to data-embed="sign" so the avatar page is not affected.
+   ====================================================================== */
+html[data-embed="sign"] {
+  --lime: #8fc3bc;                        /* accent on the dark camera panel (7.9:1 contrast) */
+  --vx-overlay: rgba(32, 36, 43, 0.86);   /* Voxa dark, replaces the old ink overlays */
+}
+
+/* Stage: sits inside Voxa's white card, no yap-render chrome */
+html[data-embed="sign"] .sign-stage { background: transparent; padding: 16px 20px 24px; }
+html[data-embed="sign"] .sign-stage-header h2,
+html[data-embed="sign"] .sign-wordmark { display: none; }   /* Voxa page already has its heading */
+html[data-embed="sign"] .sign-beta { font-family: var(--vx-mono); font-size: 0.72rem; color: var(--ink-soft); }
+html[data-embed="sign"] .sign-framing-note { color: var(--ink-soft); font-size: 0.78rem; }
+
+/* Mode switch (pill) */
+html[data-embed="sign"] .sign-recognition-modes { border-color: var(--border); background: #ffffff; }
+html[data-embed="sign"] .sign-recognition-modes button { font-family: var(--font-dm-sans); font-weight: 600; color: var(--ink-soft); }
+html[data-embed="sign"] .sign-recognition-modes button:hover { color: var(--foreground); }
+html[data-embed="sign"] .sign-recognition-modes button[aria-pressed="true"] { background: var(--primary); color: #ffffff; }
+
+/* Camera panel */
+html[data-embed="sign"] .sign-viewfinder { background: #20242b; border-color: var(--border); }
+html[data-embed="sign"] .sign-camera-shade { background: linear-gradient(180deg, rgba(32,36,43,.13), transparent 30%, transparent 70%, rgba(32,36,43,.5)); }
+html[data-embed="sign"] .sign-model-chip { background: var(--vx-overlay); border-color: rgba(247,246,242,.18); color: var(--lime); font-family: var(--vx-mono); }
+html[data-embed="sign"] .sign-model-chip button { border-color: rgba(143,195,188,.35); color: var(--lime); }
+html[data-embed="sign"] .sign-camera-controls button { background: var(--vx-overlay); border-color: rgba(247,246,242,.22); color: #f7f6f2; font-family: var(--font-dm-sans); }
+html[data-embed="sign"] .sign-camera-controls button[aria-pressed="true"] { color: var(--lime); border-color: rgba(143,195,188,.5); }
+html[data-embed="sign"] .has-hand-lock .sign-brackets { filter: drop-shadow(0 0 5px rgba(143,195,188,.35)); }
+html[data-embed="sign"] .sign-ring-track { stroke: rgba(247,246,242,.18); }
+
+/* Start / permission message */
+html[data-embed="sign"] .sign-camera-message h3 { font-family: var(--font-dm-serif); font-weight: 600; letter-spacing: -0.02em; color: #f7f6f2; }
+html[data-embed="sign"] .sign-camera-message p { color: rgba(247,246,242,.78); }
+html[data-embed="sign"] .sign-message-icon { border-color: rgba(143,195,188,.35); background: rgba(143,195,188,.08); }
+html[data-embed="sign"] .sign-permission-note { color: rgba(247,246,242,.6); }
+html[data-embed="sign"] .sign-camera-button { background: var(--primary); color: #ffffff; font-family: var(--font-dm-sans); font-weight: 600; }
+html[data-embed="sign"] .sign-camera-button:hover { background: #5f819f; }
+
+/* Live caption + hint */
+html[data-embed="sign"] .sign-camera-caption { background: var(--vx-overlay); }
+html[data-embed="sign"] .sign-camera-caption .sign-letter { color: #f7f6f2; font-family: var(--font-dm-sans); }
+html[data-embed="sign"] .sign-camera-caption .sign-letter[data-latest="true"] { color: var(--lime); }
+html[data-embed="sign"] .sign-preview-hint { background: rgba(32,36,43,.66); }
+html[data-embed="sign"] .sign-preview-hint > span:last-child { color: rgba(247,246,242,.8); }
+html[data-embed="sign"] .sign-preview-hint .dock-live-dot { background: var(--lime); box-shadow: 0 0 0 3px rgba(143,195,188,.2); }
+
+/* Below the camera */
+html[data-embed="sign"] .sign-transcript { background: #ffffff; border-color: var(--border); }
+html[data-embed="sign"] .sign-dataset-notice.has-samples { background: rgba(95,143,138,.1); }
+html[data-embed="sign"] .sign-stage-footer,
+html[data-embed="sign"] .sign-workspace-settings { color: var(--ink-soft); font-family: var(--font-dm-sans); }

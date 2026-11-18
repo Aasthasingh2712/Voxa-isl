@@ -5,7 +5,6 @@ import CameraPreview from "./CameraPreview";
 import TranslationResult from "./TranslationResult";
 import StatusPanel from "./StatusPanel";
 import SpeechToSign from "./SpeechToSign";
-
 export default function Translator({ translator }) {
   const camera = useCamera();
   const landmarker = useHandLandmarker();
